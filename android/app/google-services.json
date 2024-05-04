@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "975715569120",
+    "project_id": "notesapp-kingprime1",
+    "storage_bucket": "notesapp-kingprime1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:975715569120:android:38d9611f6fc1f9a30bef85",
+        "android_client_info": {
+          "package_name": "com.badpiggies.notes_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHMsPR2Qb0hE7Jf0TpmPbEo6YHEjlCdHs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
