@@ -15,6 +15,10 @@ void main() {
         useMaterial3: true,
       ),
       home: const HomePage(),
+      routes: {
+        "/login/": (context)=> const LoginView(),
+        "/register/": (context)=> const RegisterView(),
+      }
     )
     );
 }
@@ -24,35 +28,26 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar:AppBar(
-          title:const Text("Home Page"),
-          backgroundColor: const Color.fromARGB(255, 159, 193, 210),
-        ),
-      body: FutureBuilder(
+    return FutureBuilder(
         future:Firebase.initializeApp(
             options:DefaultFirebaseOptions.currentPlatform,
           ),
         builder:(context, snapshot) {
           switch(snapshot.connectionState){
             case ConnectionState.done:
-              final user=(FirebaseAuth.instance.currentUser);
-              if (user?.emailVerified??false){ //we can also use == false instead of ?? false.
-                print("Email is Verified");
-              }else {
-                print("Please verify your email");
-              }
-              return const Text("Done",);
+              // final user=(FirebaseAuth.instance.currentUser);
+              // if (user?.emailVerified??false){ 
+              // }else {
+              //   return VerifyEmailView();
+              // }
+              // return const Text("Done",);
+              return const LoginView();
           default:
-            return const Text("Loading...");
+            return const CircularProgressIndicator();
           }
         },
-      ),
       );
   }
 }
-
-
-
 
 
