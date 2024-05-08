@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
 import 'package:notes_app/constants/routes.dart';
+import 'package:notes_app/utilities/show_error_dialog.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -64,14 +65,39 @@ class _RegisterViewState extends State<RegisterView> {
                   password: password,
                 );
                 devtools.log(userCredential.toString());
+                final user = FirebaseAuth.instance.currentUser;
+                await user?.sendEmailVerification();
+                Navigator.of(context).pushNamed(verifyEmailRoute);
               } on FirebaseAuthException catch (e) {
                 if (e.code == "weak-password") {
-                  devtools.log("You have weak password: min 6 characters!!");
+                  await showErrorDialog(
+                    context,
+                    "Weak Password!",
+                  );
+                  devtools.log("You have weak password");
                 } else if (e.code == "email-already-in-use") {
+                  await showErrorDialog(
+                    context,
+                    "Email already in use!",
+                  );
                   devtools.log("Email already in use");
                 } else if (e.code == "invalid-email") {
-                  devtools.log("Invalid Email entered!!");
+                  await showErrorDialog(
+                    context,
+                    "Inavlid Email entered",
+                  );
+                  devtools.log("Invalid Email entered");
+                } else {
+                  await showErrorDialog(
+                    context,
+                    "Error: ${e.code}",
+                  );
                 }
+              } catch (e) {
+                await showErrorDialog(
+                  context,
+                  e.toString(),
+                );
               }
             },
             child: const Text("Register"),
