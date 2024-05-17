@@ -4,6 +4,7 @@ import 'package:notes_app/enums/menu_action.dart';
 import 'dart:developer' as devtools show log;
 
 import 'package:notes_app/services/auth/auth_service.dart';
+import 'package:notes_app/services/crud/notes_service.dart';
 
 class NotesView extends StatefulWidget {
   const NotesView({super.key});
@@ -13,39 +14,76 @@ class NotesView extends StatefulWidget {
 }
 
 class _NotesViewState extends State<NotesView> {
+  // created avariable to handle the NotesService object
+  late final NotesService _notesService;
+
+  // Getting the user email from the getter of the Firebase_provider_which gives us the email field in the AuthUser
+  String get userEmail => AuthService.firebase().currentUser!.email!;
+
+  @override
+  void initState() {
+    _notesService = NotesService();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _notesService.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          title: const Text("Notes"),
-          backgroundColor: const Color.fromARGB(255, 253, 97, 128),
-          actions: [
-            PopupMenuButton<MenuAction>(
-              onSelected: (value) async {
-                switch (value) {
-                  case (MenuAction.logout):
-                    // we are awaiting to let use click any button in the dialog box
-                    final shouldLogout = await showLogOutDialog(context);
-                    devtools.log(shouldLogout.toString());
-                    if (shouldLogout) {
-                      await AuthService.firebase().logOut();
-                      Navigator.of(context)
-                          .pushNamedAndRemoveUntil(loginRoute, (_) => false);
+        appBar: AppBar(
+            title: const Text("Notes"),
+            backgroundColor: const Color.fromARGB(255, 253, 97, 128),
+            actions: [
+              PopupMenuButton<MenuAction>(
+                onSelected: (value) async {
+                  switch (value) {
+                    case (MenuAction.logout):
+                      // we are awaiting to let use click any button in the dialog box
+                      final shouldLogout = await showLogOutDialog(context);
+                      devtools.log(shouldLogout.toString());
+                      if (shouldLogout) {
+                        await AuthService.firebase().logOut();
+                        Navigator.of(context)
+                            .pushNamedAndRemoveUntil(loginRoute, (_) => false);
+                      }
+                  }
+                },
+                itemBuilder: (context) {
+                  return const [
+                    PopupMenuItem<MenuAction>(
+                      value: MenuAction.logout,
+                      child: Text("Logout"),
+                    ),
+                  ];
+                },
+              ),
+            ]),
+        body: FutureBuilder(
+          future: _notesService.getOrCreateUser(email: userEmail),
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.done:
+                return StreamBuilder(
+                  stream: _notesService.allNotes,
+                  builder: (context, snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return const Text("f");
+                      default:
+                        return const CircularProgressIndicator();
                     }
-                }
-              },
-              itemBuilder: (context) {
-                return const [
-                  PopupMenuItem<MenuAction>(
-                    value: MenuAction.logout,
-                    child: Text("Logout"),
-                  ),
-                ];
-              },
-            ),
-          ]),
-      body: const Text("Hello World"),
-    );
+                  },
+                );
+              default:
+                return const CircularProgressIndicator();
+            }
+          },
+        ));
   }
 }
 
