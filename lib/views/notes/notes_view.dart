@@ -5,6 +5,7 @@ import 'dart:developer' as devtools show log;
 
 import 'package:notes_app/services/auth/auth_service.dart';
 import 'package:notes_app/services/crud/notes_service.dart';
+import 'package:notes_app/views/notes/new_note_view.dart';
 
 class NotesView extends StatefulWidget {
   const NotesView({super.key});
@@ -39,6 +40,12 @@ class _NotesViewState extends State<NotesView> {
             title: const Text("Notes"),
             backgroundColor: const Color.fromARGB(255, 253, 97, 128),
             actions: [
+              IconButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(newNoteRoute);
+                },
+                icon: const Icon(Icons.add),
+              ),
               PopupMenuButton<MenuAction>(
                 onSelected: (value) async {
                   switch (value) {
@@ -73,7 +80,7 @@ class _NotesViewState extends State<NotesView> {
                   builder: (context, snapshot) {
                     switch (snapshot.connectionState) {
                       case ConnectionState.waiting:
-                        return const Text("f");
+                        return const Text("Waiting for Notes...");
                       default:
                         return const CircularProgressIndicator();
                     }
