@@ -79,7 +79,10 @@ class _NotesViewState extends State<NotesView> {
                   stream: _notesService.allNotes,
                   builder: (context, snapshot) {
                     switch (snapshot.connectionState) {
+                      // implicit fall through is done here
+                      // the waiting case falls through to the active case in which widget is returned
                       case ConnectionState.waiting:
+                      case ConnectionState.active:
                         return const Text("Waiting for Notes...");
                       default:
                         return const CircularProgressIndicator();
