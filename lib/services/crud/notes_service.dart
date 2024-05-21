@@ -6,7 +6,15 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' show join;
 
 class NotesService {
-  NotesService._sharedInstance(); // create a private named constructor
+  // Below definition of named constructor will ensure that whenever it is called by a new listener
+  // the stream will be populated with all the notes for that listener to be able to listen from the start of the stream
+  NotesService._sharedInstance() {
+    _notesStreamController = StreamController<List<DatabaseNote>>.broadcast(
+      onListen: () {
+        _notesStreamController.sink.add(_notes);
+      },
+    );
+  }
   static final NotesService _shared = NotesService._sharedInstance();
   // create a private instance of the class using named constructor
   // we made the variable holding the private instance of the class a static field
@@ -21,8 +29,7 @@ class NotesService {
   List<DatabaseNote> _notes = [];
 
   // this will be used to expose all the notes from cache to the ui of app
-  final _notesStreamController =
-      StreamController<List<DatabaseNote>>.broadcast();
+  late final StreamController<List<DatabaseNote>> _notesStreamController;
 
   Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
 
