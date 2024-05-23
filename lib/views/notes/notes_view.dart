@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:notes_app/constants/routes.dart';
 import 'package:notes_app/enums/menu_action.dart';
 import 'dart:developer' as devtools show log;
-
+import 'package:notes_app/utilities/dialogs/logout_dialog.dart';
 import 'package:notes_app/services/auth/auth_service.dart';
 import 'package:notes_app/services/crud/notes_service.dart';
 import 'package:notes_app/views/notes/new_note_view.dart';
+import 'package:notes_app/views/notes/notes_list_view.dart';
 
 class NotesView extends StatefulWidget {
   const NotesView({super.key});
@@ -79,19 +80,11 @@ class _NotesViewState extends State<NotesView> {
                       case ConnectionState.active:
                         if (snapshot.hasData) {
                           final allNotes = snapshot.data as List<DatabaseNote>;
-                          return ListView.builder(
-                            itemCount: allNotes.length,
-                            itemBuilder: (context, index) {
-                              final note = allNotes[index];
-                              return ListTile(
-                                title: Text(
-                                  note.text,
-                                  maxLines: 1,
-                                  softWrap: true,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              );
+                          return NotesListView(
+                            onDeleteNote: (note) async {
+                              _notesService.deleteNote(id: note.id);
                             },
+                            notes: allNotes,
                           );
                         } else {
                           return const Center(
@@ -108,34 +101,4 @@ class _NotesViewState extends State<NotesView> {
           },
         ));
   }
-}
-
-Future<bool> showLogOutDialog(BuildContext context) {
-  // This function is a Future because we will be waiting for user to press any one of the button (cancel/log out) or select none
-  // based on what is pressed action will be performed
-  return showDialog<bool>(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text("Alert"),
-        content: const Text("Do you want to sign out?"),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(false);
-            },
-            child: const Text("Cancel"),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(true);
-            },
-            child: const Text("Logout"),
-          ),
-        ],
-      );
-    },
-  ).then((value) => value ?? false);
-  // This .then() functions says that , it will grab the value being returned by the function it is applied to and will check if the value is null or not ,
-  // if the value is not null it will return the function's value else it will return false
 }
