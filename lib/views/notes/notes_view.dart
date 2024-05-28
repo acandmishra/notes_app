@@ -5,7 +5,7 @@ import 'dart:developer' as devtools show log;
 import 'package:notes_app/utilities/dialogs/logout_dialog.dart';
 import 'package:notes_app/services/auth/auth_service.dart';
 import 'package:notes_app/services/crud/notes_service.dart';
-import 'package:notes_app/views/notes/new_note_view.dart';
+import 'package:notes_app/views/notes/create_update_note_view.dart';
 import 'package:notes_app/views/notes/notes_list_view.dart';
 
 class NotesView extends StatefulWidget {
@@ -37,7 +37,7 @@ class _NotesViewState extends State<NotesView> {
             actions: [
               IconButton(
                 onPressed: () {
-                  Navigator.of(context).pushNamed(newNoteRoute);
+                  Navigator.of(context).pushNamed(createUpdateNoteRoute);
                 },
                 icon: const Icon(Icons.add),
               ),
@@ -85,6 +85,12 @@ class _NotesViewState extends State<NotesView> {
                               _notesService.deleteNote(id: note.id);
                             },
                             notes: allNotes,
+                            onTap: (note) {
+                              Navigator.of(context).pushNamed(
+                                createUpdateNoteRoute,
+                                arguments: note,
+                              );
+                            },
                           );
                         } else {
                           return const Center(
