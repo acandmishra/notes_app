@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:notes_app/extensions/lib/filter.dart';
 import 'package:notes_app/services/crud/crud_exceptions.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
@@ -24,6 +25,7 @@ class NotesService {
       _shared; //create a factory constructor which is same as normal constructor and return the above private instance
 
   Database? _db;
+  DatabaseUser? _user;
 
   // acts as a cache buffer, where all the notes will be cached belonging to that user
   List<DatabaseNote> _notes = [];
@@ -31,14 +33,31 @@ class NotesService {
   // this will be used to expose all the notes from cache to the ui of app
   late final StreamController<List<DatabaseNote>> _notesStreamController;
 
-  Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
+  Stream<List<DatabaseNote>> get allNotes =>
+      _notesStreamController.stream.filter((note) {
+        final currentUser = _user;
+        if (currentUser != null) {
+          return note.userId == currentUser.id;
+        } else {
+          throw UserShouldBeSetBeforeReadingAllNotesException();
+        }
+      });
 
-  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+  Future<DatabaseUser> getOrCreateUser({
+    required String email,
+    bool setAsCurrentUser = true,
+  }) async {
     try {
       final user = await getUser(email: email);
+      if (setAsCurrentUser) {
+        _user = user;
+      }
       return user;
     } on CouldNotFindUserException {
       final createdUser = await createUser(email: email);
+      if (setAsCurrentUser) {
+        _user = createdUser;
+      }
       return createdUser;
     } catch (e) {
       rethrow;
@@ -64,6 +83,8 @@ class NotesService {
         textColumn: text,
         isSyncedWithCloudColumn: 0,
       },
+      where: "id=?",
+      whereArgs: [note.id],
     );
     if (updatesCount == 0) {
       throw CouldNotUpdateNoteException();
@@ -336,7 +357,7 @@ const createUserTable = '''
 
 // Sql query to create note table
 const createNoteTable = '''
-            CREATE TABLE "Note" (
+            CREATE TABLE IF NOT EXISTS "Note" (
             "id"	INTEGER NOT NULL,
             "user_id"	INTEGER NOT NULL,
             "text"	TEXT,
