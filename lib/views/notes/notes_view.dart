@@ -5,7 +5,6 @@ import 'dart:developer' as devtools show log;
 import 'package:notes_app/utilities/dialogs/logout_dialog.dart';
 import 'package:notes_app/services/auth/auth_service.dart';
 import 'package:notes_app/services/crud/notes_service.dart';
-import 'package:notes_app/views/notes/create_update_note_view.dart';
 import 'package:notes_app/views/notes/notes_list_view.dart';
 
 class NotesView extends StatefulWidget {
@@ -20,7 +19,7 @@ class _NotesViewState extends State<NotesView> {
   late final NotesService _notesService;
 
   // Getting the user email from the getter of the Firebase_provider_which gives us the email field in the AuthUser
-  String get userEmail => AuthService.firebase().currentUser!.email!;
+  String get userEmail => AuthService.firebase().currentUser!.email;
 
   @override
   void initState() {
