@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:notes_app/constants/routes.dart';
 import 'package:notes_app/services/auth/auth_service.dart';
+import 'package:notes_app/services/auth/bloc/auth_bloc.dart';
+import 'package:notes_app/services/auth/bloc/auth_event.dart';
 
 class VerifyEmailView extends StatefulWidget {
   const VerifyEmailView({super.key});
@@ -26,21 +29,16 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
             "In case you hvaen't received email verification , please click below",
           ),
           TextButton(
-            onPressed: () async {
-              await AuthService.firebase().sendEmailVerification();
+            onPressed: () {
+              context
+                  .read<AuthBloc>()
+                  .add(const AuthEventSendEmailVerification());
             },
             child: const Text("Verify Email"),
           ),
           TextButton(
-            onPressed: () async {
-              await AuthService.firebase().logOut();
-              // This is added because application is unable to refresh the applicatin state and shows verify email view even when the current user is null or the email is verified.
-              // This happens because application uses the user locally available and is unable to sync with firebase
-              // Therefore we added button to restart which signs out current user and takes us back to register view
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                registerRoute,
-                (route) => false,
-              );
+            onPressed: () {
+              context.read<AuthBloc>().add(const AuthEventLogOut());
             },
             child: const Text("Restart"),
           )
