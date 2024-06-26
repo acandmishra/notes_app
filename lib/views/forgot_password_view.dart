@@ -24,7 +24,6 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _controller.dispose();
     super.dispose();
   }
