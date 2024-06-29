@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:notes_app/extensions/buildcontext/loc.dart';
 import 'package:notes_app/services/auth/auth_service.dart';
-import 'package:notes_app/utilities/dialogs/cannot_share_empty_dialog.dart';
+import 'package:notes_app/utilities/dialogs/cannot_share_empty_note_dialog.dart';
 import 'package:notes_app/utilities/generics/get_arguments.dart';
 import 'package:notes_app/services/cloud/cloud_note.dart';
-import 'package:notes_app/services/cloud/cloud_storage_exceptions.dart';
 import 'package:notes_app/services/cloud/firebase_cloud_storage.dart';
-import 'package:path/path.dart';
 import 'package:share_plus/share_plus.dart';
 
 class CreateUpdateNoteView extends StatefulWidget {
@@ -92,7 +91,9 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("New Note"),
+        title: Text(
+          context.loc.note,
+        ),
         backgroundColor: const Color.fromARGB(255, 255, 7, 143),
         actions: [
           IconButton(
@@ -120,8 +121,8 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
                 keyboardType: TextInputType.multiline,
                 // used to enable height growth of the text field based on the input the user type, no limit for no. of lines
                 maxLines: null,
-                decoration: const InputDecoration(
-                  hintText: "Write here",
+                decoration: InputDecoration(
+                  hintText: context.loc.start_typing_your_note,
                 ),
               );
             default:
